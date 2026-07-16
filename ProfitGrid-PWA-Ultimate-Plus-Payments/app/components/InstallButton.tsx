@@ -20,7 +20,6 @@ export default function InstallButton() {
     window.addEventListener("beforeinstallprompt", handler);
 
     // If already installed
-    // @ts-expect-error - nonstandard
     if (window.matchMedia?.("(display-mode: standalone)")?.matches) {
       setHidden(true);
     }

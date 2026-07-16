@@ -363,3 +363,46 @@ for each row execute procedure public.handle_new_user();
 --    (bucket_id = 'trade_screens' AND auth.uid()::text = (storage.foldername(name))[1])
 -- 2) Allow authenticated users to upload to their own folder:
 --    (bucket_id = 'trade_screens' AND auth.uid()::text = (storage.foldername(name))[1])
+
+-- ============
+-- 12) EXTRA COLUMNS & TABLES FOR FULL ECOSYSTEM (Safe ALTER & CREATE)
+alter table if exists public.trades add column if not exists stop_loss numeric;
+alter table if exists public.trades add column if not exists take_profit numeric;
+alter table if exists public.trades add column if not exists playbook text;
+alter table if exists public.trades add column if not exists screenshot_url text;
+
+-- Watchlists table
+create table if not exists public.watchlists (
+  id bigserial primary key,
+  user_id uuid not null references auth.users(id) on delete cascade,
+  name text not null default 'My Watchlist',
+  symbols text[] not null default '{}',
+  created_at timestamptz default now(),
+  unique(user_id, name)
+);
+
+alter table public.watchlists enable row level security;
+create policy if not exists watchlists_select_own on public.watchlists for select using (auth.uid() = user_id);
+create policy if not exists watchlists_insert_own on public.watchlists for insert with check (auth.uid() = user_id);
+create policy if not exists watchlists_update_own on public.watchlists for update using (auth.uid() = user_id);
+create policy if not exists watchlists_delete_own on public.watchlists for delete using (auth.uid() = user_id);
+
+-- Backtest sessions table
+create table if not exists public.backtest_sessions (
+  id bigserial primary key,
+  user_id uuid not null references auth.users(id) on delete cascade,
+  account_id bigint references public.accounts(id) on delete cascade,
+  symbol text not null,
+  timeframe text not null,
+  initial_balance numeric not null default 10000,
+  final_balance numeric not null default 10000,
+  win_rate numeric not null default 0,
+  total_trades integer not null default 0,
+  created_at timestamptz default now()
+);
+
+alter table public.backtest_sessions enable row level security;
+create policy if not exists backtest_sessions_select_own on public.backtest_sessions for select using (auth.uid() = user_id);
+create policy if not exists backtest_sessions_insert_own on public.backtest_sessions for insert with check (auth.uid() = user_id);
+create policy if not exists backtest_sessions_update_own on public.backtest_sessions for update using (auth.uid() = user_id);
+create policy if not exists backtest_sessions_delete_own on public.backtest_sessions for delete using (auth.uid() = user_id);
