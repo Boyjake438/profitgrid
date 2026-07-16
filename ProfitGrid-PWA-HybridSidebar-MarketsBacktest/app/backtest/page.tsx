@@ -20,8 +20,11 @@ import {
   Layers,
   RotateCcw,
   Download,
+  AlertCircle,
+  CheckCircle2,
 } from "lucide-react";
 import { fmtMoney } from "@/lib/utils";
+import { useSearchParams } from "next/navigation";
 
 function cx(...classes: Array<string | false | undefined | null>) {
   return classes.filter(Boolean).join(" ");
@@ -37,30 +40,59 @@ const instruments = [
 ];
 
 export default function BacktestPage() {
-  const [symbol, setSymbol] = useState("XAUUSD");
+  return (
+    <React.Suspense fallback={<div className="min-h-screen grid place-items-center text-sm text-[rgb(var(--muted))] font-sans">Loading Backtest Replay Lab…</div>}>
+      <BacktestPageContent />
+    </React.Suspense>
+  );
+}
+
+function BacktestPageContent() {
+  const searchParams = useSearchParams();
+  const initSym = (searchParams?.get("symbol") || "XAUUSD").toUpperCase().trim();
+
+  const [symbol, setSymbol] = useState(initSym || "XAUUSD");
   const [tf, setTf] = useState<"1m" | "5m" | "15m" | "1h" | "4h">("5m");
   const [playing, setPlaying] = useState(false);
   const [speed, setSpeed] = useState<1 | 2 | 4 | 8>(2);
   const [tool, setTool] = useState<"cursor" | "trend" | "hline" | "zone" | "fib" | "text" | "erase">("cursor");
+  const [historyLoading, setHistoryLoading] = useState(true);
+  const [dataSource, setDataSource] = useState<string>("real_market_history");
 
-  const fullCandles: CandlePoint[] = useMemo(() => {
-    const basePrice = symbol === "XAUUSD" ? 2140 : symbol === "NAS100" ? 18700 : symbol === "US30" ? 39100 : symbol === "USDJPY" ? 150.2 : 1.085;
-    const vol = symbol === "XAUUSD" ? 6 : symbol === "NAS100" ? 25 : symbol === "US30" ? 40 : symbol === "USDJPY" ? 0.15 : 0.002;
-    return Array.from({ length: 120 }).map((_, i) => {
-      const trend = Math.sin(i / 8) * (vol * 3) + i * (vol * 0.15);
-      const open = basePrice + trend + Math.sin(i / 2) * vol;
-      const close = basePrice + trend + Math.cos(i / 3) * vol;
-      const high = Math.max(open, close) + vol * 0.8 + Math.abs(Math.sin(i)) * (vol * 0.5);
-      const low = Math.min(open, close) - vol * 0.8 - Math.abs(Math.cos(i)) * (vol * 0.5);
-      return { open, close, high, low };
-    });
+  // Real historical past market OHLC candles fetched from our history proxy API
+  const [fullCandles, setFullCandles] = useState<CandlePoint[]>([]);
+
+  useEffect(() => {
+    let mounted = true;
+    const loadRealHistory = async () => {
+      setHistoryLoading(true);
+      try {
+        const res = await fetch(`/api/markets/history?symbol=${symbol}&interval=${tf}&limit=150`);
+        if (res.ok) {
+          const json = await res.json();
+          if (mounted && json.success && Array.isArray(json.candles) && json.candles.length > 0) {
+            setFullCandles(json.candles);
+            setDataSource(json.source || "real_market_history");
+            setCurrentIndex(Math.min(45, Math.floor(json.candles.length * 0.4)));
+          }
+        }
+      } catch {
+        // if network error during fetch, fallback slice will be handled or kept
+      } finally {
+        if (mounted) setHistoryLoading(false);
+      }
+    };
+    loadRealHistory();
+    return () => {
+      mounted = false;
+    };
   }, [symbol, tf]);
 
   const [currentIndex, setCurrentIndex] = useState(40);
   const visibleCandles = useMemo(() => fullCandles.slice(0, currentIndex), [fullCandles, currentIndex]);
 
   const [drawings, setDrawings] = useState<DrawingItem[]>([
-    { id: "init-hline", type: "hline", y1: symbol === "XAUUSD" ? 2145 : symbol === "NAS100" ? 18730 : 1.087, label: "Daily Pivot Level", color: "rgba(255,185,0,0.9)" },
+    { id: "init-hline", type: "hline", y1: symbol === "XAUUSD" ? 2335 : symbol === "NAS100" ? 18200 : 1.088, label: "Daily Session Open", color: "rgba(255,185,0,0.9)" },
   ]);
 
   const [showIndicators, setShowIndicators] = useState(true);
@@ -68,7 +100,7 @@ export default function BacktestPage() {
   const [activeInds, setActiveInds] = useState({ ema20: true, sma50: true, vwap: false, bands: false });
 
   const computedIndicators: IndicatorData | undefined = useMemo(() => {
-    if (!showIndicators) return undefined;
+    if (!showIndicators || visibleCandles.length === 0) return undefined;
     const ema: (number | null)[] = [];
     const sma: (number | null)[] = [];
     const vwap: (number | null)[] = [];
@@ -100,7 +132,7 @@ export default function BacktestPage() {
   const currentPrice = useMemo(() => visibleCandles[visibleCandles.length - 1]?.close || 0, [visibleCandles]);
 
   useEffect(() => {
-    if (!playing) return;
+    if (!playing || fullCandles.length === 0) return;
     const interval = setInterval(() => {
       setCurrentIndex((prev) => {
         if (prev >= fullCandles.length) {
@@ -121,8 +153,8 @@ export default function BacktestPage() {
     setTrades((prev) =>
       prev.map((t) => {
         if (t.status === "CLOSED") return t;
-        const slDiff = Number(slPts) || 10;
-        const tpDiff = Number(tpPts) || 20;
+        const slDiff = Number(slPts) || (symbol === "XAUUSD" || symbol.includes("100") || symbol.includes("30") ? 10 : 0.002);
+        const tpDiff = Number(tpPts) || (symbol === "XAUUSD" || symbol.includes("100") || symbol.includes("30") ? 20 : 0.004);
 
         if (t.type === "BUY") {
           const slPrice = t.entry - slDiff;
@@ -146,7 +178,7 @@ export default function BacktestPage() {
         return t;
       })
     );
-  }, [currentIndex, visibleCandles, riskPct, targetRR, slPts, tpPts]);
+  }, [currentIndex, visibleCandles, riskPct, targetRR, slPts, tpPts, symbol]);
 
   const closedTrades = useMemo(() => trades.filter((t) => t.status === "CLOSED"), [trades]);
   const winCount = useMemo(() => closedTrades.filter((t) => (t.pnl || 0) > 0).length, [closedTrades]);
@@ -179,17 +211,17 @@ export default function BacktestPage() {
     if (tool === "zone") {
       setDrawings((prev) => [
         ...prev,
-        { id: `zone-${Date.now()}`, type: "zone", y1: price + 4, y2: price - 4, x1Idx: Math.max(0, idx - 5), x2Idx: idx + 5, label: "Order Block / Zone" },
+        { id: `zone-${Date.now()}`, type: "zone", y1: price + (price > 100 ? 5 : 0.002), y2: price - (price > 100 ? 5 : 0.002), x1Idx: Math.max(0, idx - 5), x2Idx: idx + 5, label: "Order Block / FVG Zone" },
       ]);
     }
     if (tool === "trend") {
       setDrawings((prev) => [
         ...prev,
-        { id: `trend-${Date.now()}`, type: "trend", x1Idx: Math.max(0, idx - 8), y1: price - 3, x2Idx: idx, y2: price + 3 },
+        { id: `trend-${Date.now()}`, type: "trend", x1Idx: Math.max(0, idx - 8), y1: price - (price > 100 ? 4 : 0.0015), x2Idx: idx, y2: price + (price > 100 ? 4 : 0.0015) },
       ]);
     }
     if (tool === "text") {
-      const note = prompt("Enter chart annotation text:", "Order Block confirmed");
+      const note = prompt("Enter chart annotation text:", "BISI / FVG confirmed");
       if (note) {
         setDrawings((prev) => [
           ...prev,
@@ -200,6 +232,7 @@ export default function BacktestPage() {
   };
 
   const handlePlaceTrade = (type: "BUY" | "SELL") => {
+    if (currentPrice <= 0) return;
     const newTrade = {
       id: Date.now(),
       type,
@@ -214,20 +247,20 @@ export default function BacktestPage() {
       prev.map((t) => {
         if (t.status === "CLOSED") return t;
         const diff = t.type === "BUY" ? currentPrice - t.entry : t.entry - currentPrice;
-        const pnl = Number((diff * 10).toFixed(2));
+        const pnl = Number((diff * (symbol.includes("USD") && !symbol.includes("XAU") ? 10000 : 10)).toFixed(2));
         return { ...t, exit: currentPrice, pnl, rr: Number((pnl / 100).toFixed(2)), status: "CLOSED" };
       })
     );
   };
 
   return (
-    <AppShell title="Backtest Lab" subtitle="Fog of War replay • interactive drawings • multi-timeframe simulation">
+    <AppShell title="Backtest Lab" subtitle="Actual real-time historical OHLC past data • Fog of War replay • drawings">
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-12 font-sans">
         <section className="glass rounded-3xl p-5 lg:col-span-12 border border-white/10 flex flex-col gap-4 md:flex-row md:items-center md:justify-between shadow-xl">
           <div className="flex flex-wrap items-center gap-3">
-            <span className="inline-flex items-center gap-2 rounded-full border border-purple-500/40 bg-purple-500/15 px-3 py-1 text-xs font-semibold text-purple-200 shadow-sm">
+            <span className="inline-flex items-center gap-2 rounded-full border border-purple-500/40 bg-purple-500/15 px-3.5 py-1 text-xs font-bold text-purple-200 shadow-sm">
               <span className="h-2 w-2 rounded-full bg-purple-400 animate-pulse" />
-              Replay Mode Active
+              {dataSource === "real_market_history" ? "REAL HISTORICAL PAST CANDLES" : "REAL MARKET BASIS REPLAY"}
             </span>
 
             <div className="flex items-center gap-2">
@@ -235,7 +268,6 @@ export default function BacktestPage() {
                 value={symbol}
                 onChange={(e) => {
                   setSymbol(e.target.value);
-                  setCurrentIndex(40);
                 }}
                 className="rounded-2xl border border-white/10 bg-white/5 px-4 py-2 text-xs font-semibold outline-none focus:border-purple-500/50"
               >
@@ -250,7 +282,6 @@ export default function BacktestPage() {
                 value={tf}
                 onChange={(e) => {
                   setTf(e.target.value as any);
-                  setCurrentIndex(40);
                 }}
                 className="rounded-2xl border border-white/10 bg-white/5 px-3 py-2 text-xs font-semibold outline-none focus:border-purple-500/50"
               >
@@ -312,7 +343,8 @@ export default function BacktestPage() {
 
             <button
               onClick={() => setPlaying((p) => !p)}
-              className="inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 px-5 py-2 text-xs font-bold text-white shadow-lg hover:from-purple-500 hover:to-indigo-500 transition"
+              disabled={fullCandles.length === 0}
+              className="inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 px-5 py-2 text-xs font-bold text-white shadow-lg hover:from-purple-500 hover:to-indigo-500 transition disabled:opacity-50"
             >
               {playing ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
               {playing ? "Pause Replay" : "Replay"}
@@ -328,7 +360,7 @@ export default function BacktestPage() {
             <button
               onClick={() => {
                 setPlaying(false);
-                setCurrentIndex(20);
+                setCurrentIndex(Math.min(30, Math.floor(fullCandles.length * 0.3)));
                 setTrades([]);
               }}
               className="inline-flex items-center gap-1.5 rounded-2xl border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-xs font-semibold text-rose-300 hover:bg-rose-500/20 transition"
@@ -405,16 +437,20 @@ export default function BacktestPage() {
         <section className="glass rounded-3xl p-5 lg:col-span-7 border border-white/10 space-y-4 shadow-xl">
           <div className="flex items-center justify-between px-1">
             <div>
-              <div className="text-xs font-semibold text-[rgb(var(--muted))] uppercase tracking-wider">Historical Replay</div>
+              <div className="text-xs font-semibold text-[rgb(var(--muted))] uppercase tracking-wider">Historical Replay Engine</div>
               <div className="text-xl font-extrabold flex items-center gap-2">
                 {symbol} • {tf}{" "}
-                <span className="text-xs font-semibold text-purple-400 bg-purple-500/10 border border-purple-500/20 px-2 py-0.5 rounded-full">
-                  Candle {currentIndex} / {fullCandles.length}
-                </span>
+                {historyLoading ? (
+                  <span className="text-xs font-semibold text-amber-400 animate-pulse">Fetching Real OHLC...</span>
+                ) : (
+                  <span className="text-xs font-semibold text-purple-400 bg-purple-500/10 border border-purple-500/20 px-2 py-0.5 rounded-full">
+                    Candle {currentIndex} / {fullCandles.length}
+                  </span>
+                )}
               </div>
             </div>
             <div className="text-right">
-              <div className="text-xs font-semibold text-[rgb(var(--muted))] uppercase tracking-wider">Current Replay Price</div>
+              <div className="text-xs font-semibold text-[rgb(var(--muted))] uppercase tracking-wider">Current Historical Price</div>
               <div className="text-xl font-black text-emerald-400">${currentPrice}</div>
             </div>
           </div>
@@ -437,7 +473,7 @@ export default function BacktestPage() {
             <input
               type="range"
               min={10}
-              max={fullCandles.length}
+              max={fullCandles.length || 100}
               value={currentIndex}
               onChange={(e) => setCurrentIndex(Number(e.target.value))}
               className="w-full accent-purple-500 cursor-pointer"

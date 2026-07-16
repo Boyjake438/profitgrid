@@ -21,7 +21,7 @@ import {
 type Article = {
   id: string;
   title: string;
-  category: "Technical / SMC" | "Risk & Rules" | "Psychology & Mindset" | "Checklists";
+  category: "ICT Concepts & SMC" | "ICT Execution Models" | "Risk & Prop Rules" | "Psychology & Mindset";
   summary: string;
   readTime: string;
   content: string[];
@@ -30,120 +30,140 @@ type Article = {
 
 const ARTICLES: Article[] = [
   {
-    id: "fvg-guide",
-    title: "Fair Value Gaps (FVG) & Imbalance",
-    category: "Technical / SMC",
-    summary: "How to identify price displacement, three-candle imbalances, and high-probability entry zones.",
-    readTime: "4 min read",
-    content: [
-      "A Fair Value Gap (FVG) occurs when institutional order flow enters the market with such aggressive momentum that a three-candle sequence leaves a gap where either buyers or sellers were completely unable to transact.",
-      "To identify a Bullish FVG: Look at three consecutive candles during displacement. The high of Candle 1 does not overlap with the low of Candle 3, leaving an open void on Candle 2's body.",
-      "How to trade FVGs in ProfitGrid: Mark up the FVG zone on your 15m or 1h chart. When price retraces into the top 50% (Consequent Encroachment) of the gap during London or New York open, look for a lower timeframe Break of Structure (BOS) before entering.",
-    ],
-    checklist: [
-      "Is the FVG formed after a clear liquidity sweep?",
-      "Does the FVG align with the daily session directional bias?",
-      "Is price retracing into Consequent Encroachment (50% level)?",
-      "Is your Stop Loss placed safely below the swing low / order block?",
-    ],
-  },
-  {
-    id: "market-structure",
-    title: "Market Structure & BOS vs CHoCH",
-    category: "Technical / SMC",
-    summary: "Mastering higher highs, lower lows, Break of Structure (BOS), and Change of Character (CHoCH).",
-    readTime: "5 min read",
-    content: [
-      "Market structure is the absolute foundation of price action. In a bullish trend, price creates Higher Highs (HH) and Higher Lows (HL). A valid Break of Structure (BOS) occurs when a candle body closes above the previous swing high.",
-      "Change of Character (CHoCH): When price breaks below the most recent Higher Low that led to the highest high, institutional flow is signaling a potential trend reversal.",
-      "Pro Tip: Never confuse internal minor structure on a 1m chart with macro structure on a 1H/4H chart. Always establish your bias on the 4H and execute on the 5m/15m.",
-    ],
-    checklist: [
-      "Have you checked the 4H timeframe for macro structural trend?",
-      "Did the breakout candle close with body displacement (not just a wick)?",
-      "Are you trading in the direction of the dominant session flow?",
-    ],
-  },
-  {
-    id: "liquidity-sweeps",
-    title: "Liquidity Pools & Stop Runs",
-    category: "Technical / SMC",
-    summary: "Where retail stops sit and how algorithms hunt equal highs, equal lows, and session extremes.",
+    id: "ict-liquidity-killzones",
+    title: "ICT Liquidity Pools & Killzone Sweeps (BSL / SSL)",
+    category: "ICT Concepts & SMC",
+    summary: "How algorithms engineer Buy-Side Liquidity (BSL) & Sell-Side Liquidity (SSL) and trap retail in Killzones.",
     readTime: "6 min read",
     content: [
-      "Markets move from one liquidity pool to the next. Equal Highs (EQH) and Equal Lows (EQL) act as magnets because retail breakout traders and swing traders cluster their stop losses precisely above or below those levels.",
-      "The Asian Session range often builds a tight box of buy-side and sell-side liquidity. At London Open (07:00 UTC), algorithms frequently sweep one side of the Asian high/low before initiating the real move of the day.",
+      "In Michael J. Huddleston's (Inner Circle Trader) methodology, price delivery is completely algorithmic. The interbank delivery algorithm has only two objectives: 1) Rebalance price inefficiencies (Fair Value Gaps), and 2) Seek liquidity pools.",
+      "Buy-Side Liquidity (BSL) sits directly above Equal Highs (EQH) and previous session/daily/weekly swing highs because retail short sellers place their buy-stop loss orders above those levels.",
+      "Sell-Side Liquidity (SSL) sits directly below Equal Lows (EQL) and previous swing lows because retail buyers place their sell-stop orders there.",
+      "The Judas Swing & Killzones: During the London Open Killzone (02:00 - 05:00 EST) and New York Open Killzone (07:00 - 10:00 EST), the algorithm engineers a false breakout (Judas Swing) that sweeps BSL or SSL to accumulate institutional inventory before reversing aggressively in the true intended daily direction.",
     ],
     checklist: [
-      "Has Asian high or low been taken prior to your entry?",
-      "Did price reject immediately after sweeping the liquidity pool?",
-      "Are there obvious equal highs targeting your Take Profit?",
+      "Are you currently inside an ICT Killzone (London 02:00-05:00 EST or NY 07:00-10:00 EST)?",
+      "Has a major Buy-Side (BSL) or Sell-Side (SSL) liquidity pool been swept?",
+      "Did price reject immediately after taking the liquidity without continuing higher/lower?",
+      "Are there opposing equal highs/lows acting as the target draw on liquidity?",
     ],
   },
   {
-    id: "order-blocks",
-    title: "Institutional Order Blocks (OB)",
-    category: "Technical / SMC",
-    summary: "Identifying the last down-candle before aggressive institutional buying (or last up-candle before selling).",
+    id: "ict-fvg-bisi-sibi",
+    title: "ICT Fair Value Gaps (FVG) & BISI / SIBI",
+    category: "ICT Concepts & SMC",
+    summary: "Mastering three-candle imbalances, Buyside Imbalance Sellside Inefficiency (BISI), and Consequent Encroachment.",
+    readTime: "5 min read",
+    content: [
+      "An ICT Fair Value Gap (FVG) is a specific three-candle price sequence where institutional order flow enters with such aggressive displacement that one side of the market is completely absent.",
+      "BISI (Buyside Imbalance Sellside Inefficiency): A Bullish FVG where candle 1's high and candle 3's low leave an open void across candle 2's body. Only buyers transacted; sellers were unable to participate.",
+      "SIBI (Sellside Imbalance Buyside Inefficiency): A Bearish FVG where candle 1's low and candle 3's high leave an open void across candle 2's body. Only sellers transacted.",
+      "Consequent Encroachment (CE): The exact 50% midpoint of the Fair Value Gap body. Institutions use CE as a precision execution level. When price retraces into the CE of a high-timeframe FVG inside a Killzone, expect immediate algorithmic reaction.",
+    ],
+    checklist: [
+      "Is the FVG formed by energetic candle displacement (large bodies, minimal wicks)?",
+      "Have you marked the 50% midpoint (Consequent Encroachment - CE) level?",
+      "Does this FVG reside inside a Discount array (for longs) or Premium array (for shorts)?",
+    ],
+  },
+  {
+    id: "ict-order-blocks-breakers",
+    title: "ICT Order Blocks, Breakers & Mitigation",
+    category: "ICT Concepts & SMC",
+    summary: "Institutional accumulation footprints, Mean Thresholds, and Breaker Block polarity flips.",
+    readTime: "6 min read",
+    content: [
+      "An ICT Order Block is not just any red or green candle before a move. A true high-probability Bullish Order Block is the lowest down-candle prior to energetic upward displacement that breaks structure (MSS) and leaves a Fair Value Gap.",
+      "Mean Threshold: The 50% midpoint of the Order Block's real body. For a valid bullish order block, price should never close below the Mean Threshold during a retracement.",
+      "ICT Breaker Block: When a high-timeframe liquidity sweep occurs and an existing order block fails (is broken through with displacement), that broken block flips polarity. A Bullish Breaker is the highest up-candle prior to the lowest swing low that swept SSL before reversing above the swing high.",
+      "Mitigation Block: Similar to a Breaker Block, but occurs when price fails to take out the previous swing high or low before reversing through the order block.",
+    ],
+    checklist: [
+      "Did the Order Block cause a Market Structure Shift (MSS) with displacement?",
+      "Does the Order Block have an open Fair Value Gap attached directly above/below it?",
+      "Is price respecting the Mean Threshold (50% level of the OB body)?",
+    ],
+  },
+  {
+    id: "ict-mss-displacement",
+    title: "ICT Market Structure Shift (MSS) & Displacement",
+    category: "ICT Concepts & SMC",
+    summary: "Differentiating between minor internal structure vs. true institutional structural shifts.",
     readTime: "4 min read",
     content: [
-      "An Order Block represents the precise price footprint where major institutions accumulated their positions before igniting a massive market impulse.",
-      "A high-probability Bullish Order Block is the last bearish candle prior to a strong bullish move that breaks structure (BOS) and creates a Fair Value Gap.",
+      "A true ICT Market Structure Shift (MSS) occurs ONLY after price has tapped into a higher-timeframe point of interest (PD Array) or swept Buy-Side/Sell-Side Liquidity.",
+      "Dis Displacement: The most critical requirement for an MSS is displacement—large, high-energy institutional candles closing beyond the previous swing high or low. If price merely wicks above/below a swing without body displacement, it is often just another liquidity sweep rather than a true structure shift.",
     ],
   },
   {
-    id: "prop-firm-rules",
-    title: "Prop Firm Constitution & Drawdown Math",
-    category: "Risk & Rules",
-    summary: "Survival guide for FTMO, Apex, TopStep, and FundedNext limits. Master trailing vs static drawdown.",
+    id: "ict-silver-bullet-model",
+    title: "ICT 2022 Mentorship Silver Bullet Model",
+    category: "ICT Execution Models",
+    summary: "The repeatable institutional execution template for 10:00 AM EST and London Killzones.",
     readTime: "7 min read",
     content: [
-      "Over 90% of prop firm challenges fail not because of a bad strategy, but due to breaching Daily Loss or Maximum Drawdown rules during emotional tilt.",
-      "Daily Maximum Loss (e.g. 5%): This includes closed P&L plus floating open equity drawdown across your active account. Always stop trading after losing 2R in a single day.",
-      "ProfitGrid Risk Rule Engine: Set up your rules in the Analytics & Profile tabs. Our dashboard tracks your real-time drawdown against your starting balance to protect your funded status.",
+      "The ICT Silver Bullet is a time-based execution model that repeats almost daily within specific 60-minute windows: 1) London Open Silver Bullet (03:00 - 04:00 AM EST), and 2) NY AM Silver Bullet (10:00 - 11:00 AM EST).",
+      "Step 1 (Time & Draw): Wait until exactly 10:00 AM EST. Identify where the nearest Buy-Side Liquidity (BSL) or Sell-Side Liquidity (SSL) resides.",
+      "Step 2 (The Sweep): Watch price sweep either BSL or SSL after 10:00 AM.",
+      "Step 3 (The Shift): On the 1m, 3m, or 5m chart, wait for a Market Structure Shift (MSS) with clear displacement that creates a Fair Value Gap (FVG).",
+      "Step 4 (Execution & Target): Enter a limit order at the FVG Consequent Encroachment (or open edge). Place Stop Loss just beyond the sweep extreme. Target the opposing liquidity pool for a minimum 2R to 3R payoff.",
     ],
     checklist: [
-      "Did you check economic news calendar before session start?",
-      "Is your total daily risk capped strictly under 2% to 3%?",
-      "Do you have static stop losses set immediately upon order execution?",
+      "Is the time strictly within the 10:00 AM - 11:00 AM EST window (or 03:00 - 04:00 AM London)?",
+      "Did price sweep Buy-Side or Sell-Side Liquidity within this window?",
+      "Did a clear 1m/3m/5m Market Structure Shift occur with an open FVG?",
+      "Is your Take Profit targeting obvious opposing liquidity at a minimum of 2:1 R:R?",
     ],
   },
   {
-    id: "risk-management",
-    title: "The 1% Rule & Asymmetric Expectancy",
-    category: "Risk & Rules",
-    summary: "Why a 40% win rate strategy with a 2.5R average risk-to-reward makes you consistently profitable.",
+    id: "ict-power-of-three-amd",
+    title: "ICT Daily Bias & Power of Three (AMD)",
+    category: "ICT Execution Models",
+    summary: "Accumulation, Manipulation, and Distribution across daily open price and session killzones.",
     readTime: "5 min read",
     content: [
-      "Expectancy = (Win Rate × Average Win) - (Loss Rate × Average Loss). If your average win is $250 (2.5R) and average loss is $100 (1R), even winning only 4 out of 10 trades yields a net positive expectancy of +$400 every 10 trades.",
-      "Never risk more than 1% per trade on a live account (or 0.5% on a funded prop challenge). Position sizing must be adjusted based on stop loss pips, never fixed lot sizes.",
-    ],
-  },
-  {
-    id: "trading-psychology",
-    title: "Overcoming FOMO, Revenge Trading & Tilt",
-    category: "Psychology & Mindset",
-    summary: "Neurological triggers of losses, accepting uncertainty, and executing like a casino rather than a gambler.",
-    readTime: "6 min read",
-    content: [
-      "After a painful loss, the amygdala triggers a fight-or-flight response. Revenge trading is the desperate attempt to force the market to give back what was lost right immediately.",
-      "The Casino Mindset: A casino doesn't get angry when a player hits a jackpot at the roulette table. They know that over 10,000 spins, their 52% mathematical edge guarantees profitability. Treat every individual trade as just one random sample in your 100-trade playbook.",
+      "The ICT Power of Three (AMD) explains how institutional daily candles are constructed: Accumulation, Manipulation, and Distribution.",
+      "In a Bullish Daily Profile: 1) Accumulation happens during the Asian range near the New York Midnight Open (00:00 EST). 2) Manipulation happens at London Open or NY 08:30 AM when price drops BELOW the midnight open (forming the daily low / Judas Swing) to trap short sellers and sweep SSL. 3) Distribution happens when price expands aggressively upwards through New York lunch and closes near the daily high.",
+      "Golden Rule of AMD: If your daily bias is bullish, NEVER buy above the 00:00 Midnight Open price during accumulation. Always wait for the manipulation drop into Discount below the midnight open before initiating longs.",
     ],
     checklist: [
-      "Am I taking this trade out of FOMO because I missed the initial move?",
-      "Am I calm, rested, and detached from the monetary outcome?",
-      "Did I log my pre-session emotional score in my ProfitGrid journal?",
+      "Have you marked the exact 00:00 Midnight EST Open price on your chart?",
+      "If Bullish Bias: Has price manipulated and dropped BELOW the midnight open price?",
+      "If Bearish Bias: Has price manipulated and spiked ABOVE the midnight open price?",
     ],
   },
   {
-    id: "journaling-mastery",
-    title: "Structured Journaling & Weekly Audits",
-    category: "Psychology & Mindset",
-    summary: "Why top 1% institutional traders review every single execution with markups and checklists.",
-    readTime: "4 min read",
+    id: "ict-ote-premium-discount",
+    title: "ICT Optimal Trade Entry (OTE) & PD Arrays",
+    category: "ICT Execution Models",
+    summary: "The institutional pricing matrix using 62% - 79% Fibonacci retracements and OTE precision.",
+    readTime: "5 min read",
     content: [
-      "If you cannot measure your habits, you cannot improve your edge. A trading journal is not just a list of numbers; it is your business ledger and diagnostic laboratory.",
-      "Weekly Review Habit: Every Saturday morning, open ProfitGrid's Reviews module. Filter your trades by 'Losses' and inspect your screenshots. Did you break your rules or was it a high-quality losing setup?",
+      "Institutions buy in Discount arrays and sell in Premium arrays. To define Premium and Discount, draw a Fibonacci grid from the major swing low to swing high of the current dealing range.",
+      "50% Equilibrium: Any price above 50% is Premium (look only for short/sell setups). Any price below 50% is Discount (look only for long/buy setups).",
+      "Optimal Trade Entry (OTE): The precision Fibonacci zone between the 62% and 79% retracement levels, with the 70.5% level acting as the exact institutional sweet spot. When an OTE zone aligns directly with a Fair Value Gap or Order Block inside Discount/Premium, you have high-probability institutional confluence.",
+    ],
+    checklist: [
+      "Have you drawn the dealing range from confirmed swing low to swing high?",
+      "Is your Long entry strictly below the 50% Equilibrium level (inside Discount)?",
+      "Does the 62% - 79% OTE Fibonacci zone overlap with a clear FVG or Order Block?",
+    ],
+  },
+  {
+    id: "ict-prop-firm-defense",
+    title: "ICT Risk Defense for Funded Prop Accounts",
+    category: "Risk & Prop Rules",
+    summary: "Why ICT methodology requires strict 0.5% risk limits and disciplined killzone patience.",
+    readTime: "5 min read",
+    content: [
+      "Michael Huddleston constantly emphasizes that capital preservation is far more important than high win rates. In prop firm challenges (FTMO, Apex, TopStep), maximum daily drawdown limits can be breached instantly during emotional revenge trading.",
+      "The 0.5% Execution Rule: On a $100,000 funded account, 0.5% risk equals $500 per trade. By risking only 0.5%, you can endure 10 consecutive losing setups while only drawing down 5% of your capital—leaving your funded account completely safe and active.",
+      "If you miss the morning Killzone (07:00 - 10:00 AM EST), close your charts. Never force setups during low-volume lunchtime chop (12:00 - 13:00 EST).",
+    ],
+    checklist: [
+      "Is your total position risk capped strictly at or below 0.5% to 1.0%?",
+      "Did you check forexfactory / economic news before entering during 08:30 AM EST red folders?",
+      "Have you logged your exact trade markup and ICT model in ProfitGrid?",
     ],
   },
 ];
@@ -152,7 +172,7 @@ export default function HandbookPage() {
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<string>("All");
   const [selectedArticle, setSelectedArticle] = useState<Article>(ARTICLES[0]);
-  const [bookmarks, setBookmarks] = useState<Record<string, boolean>>({ "fvg-guide": true, "prop-firm-rules": true });
+  const [bookmarks, setBookmarks] = useState<Record<string, boolean>>({ "ict-silver-bullet-model": true, "ict-liquidity-killzones": true });
   const [checklistProgress, setChecklistProgress] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
@@ -186,27 +206,27 @@ export default function HandbookPage() {
   }, [query, category, bookmarks]);
 
   return (
-    <AppShell title="Trading Handbook & Rules" subtitle="SMC education • prop firm rules • interactive checklists • psychology">
+    <AppShell title="ICT Concepts & Trading Handbook" subtitle="SMC & Inner Circle Trader mentorship • Silver Bullet • OTE • Killzones">
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-12 font-sans">
         <div className="lg:col-span-5 space-y-4">
-          <div className="glass-soft rounded-3xl p-5 border border-white/10 space-y-3">
+          <div className="glass-soft rounded-3xl p-5 border border-white/10 space-y-3 shadow-xl">
             <div className="relative">
               <Search className="absolute left-3.5 top-3 h-4 w-4 text-[rgb(var(--muted))]" />
               <input
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="Search FVG, Liquidity, Prop Rules, Tilt..."
+                placeholder="Search FVG, Killzone, Silver Bullet, OTE..."
                 className="w-full rounded-2xl border border-white/10 bg-white/5 pl-10 pr-4 py-2.5 text-xs outline-none focus:border-purple-500/50"
               />
             </div>
 
             <div className="flex flex-wrap gap-1.5 pt-1">
-              {["All", "Technical / SMC", "Risk & Rules", "Psychology & Mindset", "Bookmarks"].map((c) => (
+              {["All", "ICT Concepts & SMC", "ICT Execution Models", "Risk & Prop Rules", "Bookmarks"].map((c) => (
                 <button
                   key={c}
                   onClick={() => setCategory(c)}
                   className={`rounded-xl px-3 py-1.5 text-[11px] font-semibold transition ${
-                    category === c ? "bg-purple-500/20 border border-purple-500/40 text-purple-200" : "bg-white/5 hover:bg-white/10 text-[rgb(var(--muted))]"
+                    category === c ? "bg-purple-500/20 border border-purple-500/40 text-purple-200 shadow-sm" : "bg-white/5 hover:bg-white/10 text-[rgb(var(--muted))]"
                   }`}
                 >
                   {c === "Bookmarks" ? "★ Bookmarked" : c}
@@ -215,7 +235,7 @@ export default function HandbookPage() {
             </div>
           </div>
 
-          <div className="space-y-3 max-h-[600px] overflow-y-auto pr-1">
+          <div className="space-y-3 max-h-[620px] overflow-y-auto pr-1">
             {filtered.map((art) => {
               const active = selectedArticle.id === art.id;
               const isBm = bookmarks[art.id];
@@ -224,7 +244,7 @@ export default function HandbookPage() {
                   key={art.id}
                   onClick={() => setSelectedArticle(art)}
                   className={`glass rounded-3xl p-5 border transition cursor-pointer flex flex-col justify-between ${
-                    active ? "bg-purple-500/15 border-purple-500/40 shadow-lg" : "border-white/10 hover:border-white/20 bg-white/5"
+                    active ? "bg-purple-500/15 border-purple-500/40 shadow-xl" : "border-white/10 hover:border-white/20 bg-white/5"
                   }`}
                 >
                   <div>
@@ -266,7 +286,7 @@ export default function HandbookPage() {
                 <span className="rounded-full bg-purple-500/20 border border-purple-500/30 px-3 py-1 text-[11px] font-bold text-purple-300 uppercase">
                   {selectedArticle.category}
                 </span>
-                <div className="mt-3 text-2xl font-extrabold tracking-tight">{selectedArticle.title}</div>
+                <div className="mt-3 text-2xl font-extrabold tracking-tight text-white">{selectedArticle.title}</div>
                 <div className="mt-1 text-xs text-[rgb(var(--muted))]">{selectedArticle.summary} • {selectedArticle.readTime}</div>
               </div>
 
@@ -291,12 +311,12 @@ export default function HandbookPage() {
             </div>
 
             {selectedArticle.checklist && (
-              <div className="mt-8 rounded-3xl bg-gradient-to-br from-purple-500/10 to-indigo-500/10 border border-purple-500/30 p-6 space-y-4">
+              <div className="mt-8 rounded-3xl bg-gradient-to-br from-purple-500/10 to-indigo-500/10 border border-purple-500/30 p-6 space-y-4 shadow-xl">
                 <div className="flex items-center gap-2 text-base font-bold text-purple-300">
-                  <CheckSquare className="h-5 w-5" /> Interactive Pre-Entry Checklist
+                  <CheckSquare className="h-5 w-5" /> ICT Model Execution Checklist
                 </div>
                 <div className="text-xs text-[rgb(var(--muted))]">
-                  Check off each rule before placing your trade to verify alignment with institutional flow.
+                  Verify every institutional confluence point before placing limit orders inside your active session killzone.
                 </div>
 
                 <div className="space-y-2.5 pt-2">
@@ -328,9 +348,9 @@ export default function HandbookPage() {
           </div>
 
           <div className="pt-4 border-t border-white/10 flex items-center justify-between text-xs text-[rgb(var(--muted))]">
-            <span>ProfitGrid Integrated Education Handbook</span>
+            <span>ProfitGrid • Authentic Inner Circle Trader (ICT) Mentorship Reference</span>
             <button
-              onClick={() => alert("Bookmark saved to your cloud profile! Access anytime during live review.")}
+              onClick={() => alert("ICT execution guide & checklist bookmarked to your active trader profile! ✅")}
               className="rounded-xl bg-white/10 hover:bg-white/15 px-4 py-2 text-xs font-semibold text-white transition"
             >
               Save Guide to Profile ✅
