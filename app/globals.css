@@ -1,0 +1,67 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ProfitGrid Premium Theme Tokens */
+:root {
+  --bg: 10 10 12;
+  --fg: 240 240 245;
+  --muted: 165 170 180;
+  --card: 18 18 22;
+  --border: 55 55 65;
+
+  --emerald: 16 185 129;
+  --red: 248 113 113;
+  --gold: 255 215 0;
+
+  --glow: 120 90 255;
+  --glow2: 0 220 255;
+}
+
+html:not(.dark) {
+  --bg: 245 246 250;
+  --fg: 18 18 22;
+  --muted: 90 95 110;
+  --card: 255 255 255;
+  --border: 220 224 235;
+
+  --glow: 140 110 255;
+  --glow2: 0 190 255;
+}
+
+html, body {
+  height: 100%;
+}
+
+body {
+  background: rgb(var(--bg));
+  color: rgb(var(--fg));
+}
+
+/* Premium glass helper */
+.glass {
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.08),
+    rgba(255, 255, 255, 0.03)
+  );
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: 0 20px 80px rgba(0, 0, 0, 0.35);
+}
+
+html:not(.dark) .glass {
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.03),
+    rgba(0, 0, 0, 0.02)
+  );
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 20px 70px rgba(0, 0, 0, 0.10);
+}
+
+/* Nice selection */
+::selection {
+  background: rgba(16, 185, 129, 0.25);
+}
