@@ -199,7 +199,7 @@ export async function GET(req: Request) {
   });
 
   const bytes = await pdf.save();
-  return new NextResponse(bytes, {
+  return new NextResponse(Buffer.from(bytes), {
     headers: {
       "Content-Type": "application/pdf",
       "Content-Disposition": `attachment; filename=ProfitGrid-${year}-${String(month).padStart(2, "0")}.pdf`,

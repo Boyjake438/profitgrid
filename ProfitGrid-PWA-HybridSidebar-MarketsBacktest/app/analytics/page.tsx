@@ -431,7 +431,7 @@ export default function AnalyticsPage() {
           <div className="flex items-center justify-between">
             <div>
               <div className="text-sm font-semibold">Drawdown curve</div>
-              <div className="text-xs text-[rgb(var(--muted))]">Peak-to-trough (<= 0)</div>
+              <div className="text-xs text-[rgb(var(--muted))]">Peak-to-trough ({"<= 0"})</div>
             </div>
             <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-[rgb(var(--muted))]">
               {plan === "pro" ? "Pro" : "Free"}

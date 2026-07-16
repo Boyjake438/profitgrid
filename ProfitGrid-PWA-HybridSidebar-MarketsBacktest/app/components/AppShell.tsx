@@ -8,10 +8,12 @@ import ThemeToggle from "./ThemeToggle";
 export default function AppShell({
   title,
   subtitle,
+  active,
   children,
 }: {
   title: string;
   subtitle?: string;
+  active?: string | any;
   children: React.ReactNode;
 }) {
   return (
